@@ -5,6 +5,7 @@
 `g++ -O3 main.cpp` for branchless, auto-vectorized (comment out inline asm and uncomment the loop)
 
 ```
+AMD Ryzen 7 3700X (16) @ 4.100GHz
 [random data / predictable data]
 
 [357ms / 50ms] normal branch, hardcoded add 69
