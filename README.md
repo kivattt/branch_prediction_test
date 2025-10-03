@@ -12,4 +12,5 @@ gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
 [357ms / 50ms] normal branch, hardcoded add 69
 [54ms / 55ms] conditional mov (lea, cmp, cmove plus 2 unnecessary instructions..)
 [26ms / 26ms] branchless, vectorized
+[17ms / 17ms] cheesy auto-vectorized sum (AVX2 256-bit simd)
 ```
