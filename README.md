@@ -6,6 +6,7 @@
 
 ```
 AMD Ryzen 7 3700X (16) @ 4.100GHz
+gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
 [random data / predictable data]
 
 [357ms / 50ms] normal branch, hardcoded add 69
