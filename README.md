@@ -1,8 +1,8 @@
 `objdump -d a.out > file` to disassemble, search for `do_thing` routine
 
 `g++ -O1 main.cpp` for the cmove inline assembly\
-`g++ -O2 main.cpp` for normal branching\
-`g++ -O3` for branchless, auto-vectorized
+`g++ -O2 main.cpp` for normal branching (comment out inline asm and uncomment the loop)\
+`g++ -O3 main.cpp` for branchless, auto-vectorized (comment out inline asm and uncomment the loop)
 
 ```
 [random data / predictable data]
