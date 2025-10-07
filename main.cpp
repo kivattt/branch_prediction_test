@@ -34,7 +34,6 @@ unsigned long long do_thing(std::vector<int> &vec, std::string label) {
 
 	unsigned long long sum = 0;
 
-#if 1
 	for (int i = 0; i < vec.size(); i++) {
 		asm(
 			"leaq 69(%[sum]), %%rdx;" // rdx = sum + 69
@@ -49,8 +48,9 @@ unsigned long long do_thing(std::vector<int> &vec, std::string label) {
 		/*if (vec[i] == 69) {
 			sum += vec[i];
 		}*/
+
+		//sum += vec[i];
 	}
-#endif
 
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
