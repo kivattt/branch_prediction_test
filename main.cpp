@@ -1,3 +1,7 @@
+// Compile with g++ -O3 -fopenmp main.cpp
+// The reason -O0 is so much slower than -O3 is probably because
+// the loop logic gets bloated.
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -22,34 +26,49 @@ std::vector<int> predictable_numbers(int howMany) {
 	return out;
 }
 
-void print_vec(std::vector<int> &vec) {
-	for (int &e : vec) {
-		std::cout << e << ',';
-	}
-	std::cout << '\n';
-}
-
-unsigned long long do_thing(std::vector<int> &vec, std::string label) {
+// Needs optimize("O2") to remove calling vec index twice
+unsigned long long __attribute__ ((optimize("O2"))) test_normal_branch(std::vector<int> &vec, std::string label) {
 	auto start = std::chrono::high_resolution_clock::now();
 
 	unsigned long long sum = 0;
 
-	for (int i = 0; i < vec.size(); i++) {
+	// A normal "for i = 0..." loop would increment two registers.
+	// This for-each avoids that.
+	// Uncomment the pragma line to multi-thread it.
+//#pragma omp parallel for reduction(+:sum)
+	for (int &e : vec) {
+		if (e == 69) {
+			sum += e;
+		}
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+
+	std::cout << label << ": " << duration.count() << "ms\n";
+	std::cerr << sum << '\n';
+	return sum;
+}
+
+unsigned long long __attribute__ ((optimize("O1"))) test_conditional_move(std::vector<int> &vec, std::string label) {
+	auto start = std::chrono::high_resolution_clock::now();
+
+	unsigned long long sum = 0;
+
+	// A normal "for i = 0..." loop would increment two registers.
+	// This for-each avoids that.
+	// Uncomment the pragma line to multi-thread it.
+//#pragma omp parallel for reduction(+:sum)
+	for (int &e : vec) {
 		asm(
 			"leaq 69(%[sum]), %%rdx;" // rdx = sum + 69
 			"cmpl $69, %[vec_i];" // if (vec[i] == 69)
-			"cmove %%rdx, %[sum];" // sum += 69;
+			"cmove %%rdx, %[sum];" // sum = rdx;
 
 			: [sum] "+r" (sum)
-			: [vec_i] "m" (vec[i])
+			: [vec_i] "m" (e)
 			: "rbx", "edx", "rdx"
 		);
-
-		/*if (vec[i] == 69) {
-			sum += vec[i];
-		}*/
-
-		//sum += vec[i];
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
@@ -64,12 +83,9 @@ int main() {
 	std::vector<int> vecRandom = random_numbers(100000000); // 400 MB
 	std::vector<int> vecPredictable = predictable_numbers(100000000); // 400 MB
 
-	//std::vector<int> vecRandom = random_numbers(1000000); // 4 MB
-	//std::vector<int> vecPredictable = predictable_numbers(1000000); // 4 MB
+	unsigned long long sum1 = test_normal_branch(vecRandom, "[Normal branch] random");
+	unsigned long long sum2 = test_normal_branch(vecPredictable, "[Normal branch] predictable");
 
-	//std::vector<int> vecRandom = random_numbers(65536); // 256 KiB
-	//std::vector<int> vecPredictable = predictable_numbers(65536); // 256 KiB
-
-	unsigned long long sum1 = do_thing(vecRandom, "random");
-	unsigned long long sum2 = do_thing(vecPredictable, "predictable");
+	unsigned long long sum3 = test_conditional_move(vecRandom, "[Conditional move] random");
+	unsigned long long sum4 = test_conditional_move(vecPredictable, "[Conditional move] predictable");
 }

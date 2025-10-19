@@ -1,8 +1,9 @@
-`objdump -d a.out > file` to disassemble, search for `do_thing` routine
+```
+./compile.sh
+./a.out
+```
 
-`g++ -O1 main.cpp` for the cmove inline assembly\
-`g++ -O2 main.cpp` for normal branching (comment out inline asm and uncomment the loop)\
-`g++ -march=native -O3 main.cpp` for branchless, auto-vectorized (comment out inline asm and uncomment the loop)
+`objdump -d a.out > file` to disassemble, search for `do_thing` routine
 
 ```
 AMD Ryzen 7 3700X (16) @ 4.100GHz
