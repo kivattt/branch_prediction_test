@@ -27,7 +27,7 @@ std::vector<int> predictable_numbers(int howMany) {
 }
 
 // Needs optimize("O2") to remove calling vec index twice
-unsigned long long __attribute__ ((optimize("O2"))) test_normal_branch(std::vector<int> &vec, std::string label) {
+unsigned long long __attribute__ ((optimize("O2"))) normal_branch(std::vector<int> &vec, std::string label) {
 	auto start = std::chrono::high_resolution_clock::now();
 
 	unsigned long long sum = 0;
@@ -43,14 +43,14 @@ unsigned long long __attribute__ ((optimize("O2"))) test_normal_branch(std::vect
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
 
-	std::cout << label << ": " << duration.count() << "ms\n";
+	std::cout << label << ": " << duration.count() << " microseconds\n";
 	std::cerr << sum << '\n';
 	return sum;
 }
 
-unsigned long long __attribute__ ((optimize("O1"))) test_conditional_move(std::vector<int> &vec, std::string label) {
+unsigned long long __attribute__ ((optimize("O1"))) conditional_move(std::vector<int> &vec, std::string label) {
 	auto start = std::chrono::high_resolution_clock::now();
 
 	unsigned long long sum = 0;
@@ -72,20 +72,21 @@ unsigned long long __attribute__ ((optimize("O1"))) test_conditional_move(std::v
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
 
-	std::cout << label << ": " << duration.count() << "ms\n";
+	std::cout << label << ": " << duration.count() << " microseconds\n";
 	std::cerr << sum << '\n';
 	return sum;
 }
 
 int main() {
-	std::vector<int> vecRandom = random_numbers(100000000); // 400 MB
-	std::vector<int> vecPredictable = predictable_numbers(100000000); // 400 MB
+	// Changing the size of these seem to do nothing to the relative speeds
+	std::vector<int> vecRandom = random_numbers(10000); // 40 kB
+	std::vector<int> vecPredictable = predictable_numbers(10000); // 40 kB
 
-	unsigned long long sum1 = test_normal_branch(vecRandom, "[Normal branch] random");
-	unsigned long long sum2 = test_normal_branch(vecPredictable, "[Normal branch] predictable");
+	unsigned long long sum1 = normal_branch(vecRandom, "[Normal branch] random");
+	unsigned long long sum2 = normal_branch(vecPredictable, "[Normal branch] predictable");
 
-	unsigned long long sum3 = test_conditional_move(vecRandom, "[Conditional move] random");
-	unsigned long long sum4 = test_conditional_move(vecPredictable, "[Conditional move] predictable");
+	unsigned long long sum3 = conditional_move(vecRandom, "[Conditional move] random");
+	unsigned long long sum4 = conditional_move(vecPredictable, "[Conditional move] predictable");
 }
